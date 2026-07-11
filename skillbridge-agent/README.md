@@ -124,11 +124,9 @@ The `data/` folder is ignored by git, so demo progress stays local.
 
 ## Setup
 
-This Windows machine uses `slackcli` because `slack.exe` is already used by the Slack desktop app.
-
 ```powershell
-cd "C:\Users\Chandan\OneDrive\Documents\SkillBridge Agent\skillbridge-agent"
-& "$env:LOCALAPPDATA\slack-cli\bin\slackcli.exe" login
+cd skillbridge-agent
+slack login
 ```
 
 Create `.env` from `.env.sample` and add:
@@ -148,7 +146,7 @@ SLACK_BOT_TOKEN=xoxb-your_bot_token
 ## Run
 
 ```powershell
-& "$env:LOCALAPPDATA\slack-cli\bin\slackcli.exe" run
+slack run
 ```
 
 Or:

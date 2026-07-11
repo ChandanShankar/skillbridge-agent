@@ -38,9 +38,9 @@ SKILLBRIDGE_LEARNING_COMMUNITY_CHANNEL_ID=C...
 From PowerShell:
 
 ```powershell
-cd "C:\Users\Chandan\OneDrive\Documents\SkillBridge Agent\skillbridge-agent"
+cd skillbridge-agent
 npm.cmd run check
-& "$env:LOCALAPPDATA\slack-cli\bin\slackcli.exe" run
+slack run
 ```
 
 Expected result: Slack CLI starts the app without manifest errors.
