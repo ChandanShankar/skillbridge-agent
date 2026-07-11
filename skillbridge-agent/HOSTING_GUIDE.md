@@ -4,9 +4,9 @@ This Slack app is a long-running Node.js process using Slack Socket Mode. It sho
 
 ## Recommended Hackathon Option: Render
 
-Render is the easiest option for a short hackathon demo because it can run a Node.js web service and provide a public health URL.
+Render is the easiest option for a short live demo because it can run a Node.js web service and provide a public health URL.
 
-Important limitation: Render Free web services can spin down after 15 minutes without inbound traffic. For a live hackathon demo, open the Render service URL before testing Slack so the service is awake.
+Important limitation: Render Free web services can spin down after 15 minutes without inbound traffic. For a live demo, open the Render service URL before testing Slack so the service is awake.
 
 The app includes:
 
@@ -118,7 +118,7 @@ This gives judges a simple public proof that the hosted Node app is live.
 
 ## Stop Or Remove After August
 
-After the hackathon:
+After the demo period:
 
 1. In Render, open the `skillbridge-agent` service.
 2. Choose Suspend if you may use it later.
