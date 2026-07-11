@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: skillbridge-agent
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SLACK_APP_TOKEN
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
