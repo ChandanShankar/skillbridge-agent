@@ -35,4 +35,28 @@ describe('runGeminiAgent known Salesforce concepts', () => {
     assert.match(result.finalOutput, /Topic: \*\*Salesforce Clouds\*\*/);
     assert.match(result.finalOutput, /Case management/);
   });
+
+  it('answers Salesforce system administration questions directly', async () => {
+    const result = await runGeminiAgent('What is field level security?', 'test prompt');
+
+    assert.match(result.finalOutput, /Field-level security in Salesforce/);
+    assert.match(result.finalOutput, /Topic: \*\*Salesforce System Administration\*\*/);
+    assert.match(result.finalOutput, /specific field/);
+  });
+
+  it('answers Apex concept questions directly', async () => {
+    const result = await runGeminiAgent('What is an Apex trigger?', 'test prompt');
+
+    assert.match(result.finalOutput, /Apex trigger/);
+    assert.match(result.finalOutput, /Topic: \*\*Apex\*\*/);
+    assert.match(result.finalOutput, /record changes/);
+  });
+
+  it('answers LWC concept questions directly', async () => {
+    const result = await runGeminiAgent('What is wire adapter in LWC?', 'test prompt');
+
+    assert.match(result.finalOutput, /Wire adapter in LWC/);
+    assert.match(result.finalOutput, /Topic: \*\*LWC\*\*/);
+    assert.match(result.finalOutput, /reactively/);
+  });
 });

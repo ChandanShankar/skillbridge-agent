@@ -152,6 +152,118 @@ const SALESFORCE_CONCEPTS = [
     nextStep: 'Create separate permission sets by responsibility, then group them for each job role.',
   },
   {
+    title: 'Salesforce System Administration',
+    topic: 'Salesforce System Administration',
+    aliases: ['system administration', 'salesforce system administration', 'salesforce sys admin', 'sys admin'],
+    summary:
+      '**Salesforce System Administration** is the work of configuring, securing, monitoring, and maintaining a Salesforce org so users can work safely and efficiently.',
+    example:
+      'A system administrator creates users, assigns permission sets, manages profiles, configures flows, builds reports, and reviews login or audit activity.',
+    uses: ['User and access management', 'Automation and data quality setup', 'Reports, dashboards, releases, and org health checks'],
+    nextStep: 'Start with users, profiles, permission sets, roles, sharing, objects, fields, Flow, reports, and dashboards.',
+  },
+  {
+    title: 'Org-wide defaults in Salesforce',
+    topic: 'Salesforce System Administration',
+    aliases: ['org-wide default', 'org wide default', 'owd', 'organization-wide default', 'organization wide default'],
+    summary:
+      '**Org-wide defaults** define the baseline record access for an object, such as Private, Public Read Only, or Public Read/Write.',
+    example: 'If Opportunities are Private, users normally see only the opportunities they own unless roles, sharing rules, or teams open access.',
+    uses: ['Set the minimum record visibility', 'Protect sensitive records', 'Design sharing rules and role hierarchy correctly'],
+    nextStep: 'Decide the most restrictive default first, then open access with roles, sharing rules, teams, or manual sharing.',
+  },
+  {
+    title: 'Field-level security in Salesforce',
+    topic: 'Salesforce System Administration',
+    aliases: ['field-level security', 'field level security', 'fls'],
+    summary:
+      '**Field-level security** controls whether users can see or edit a specific field, even if they can access the object and record.',
+    example: 'A recruiter may see Candidate records but not see a confidential Salary Expectation field.',
+    uses: ['Hide sensitive fields', 'Control edit access', 'Troubleshoot missing fields on pages and reports'],
+    nextStep: 'Check object permission, field-level security, and page layout when a user cannot see or edit a field.',
+  },
+  {
+    title: 'Validation rule in Salesforce',
+    topic: 'Salesforce System Administration',
+    aliases: ['validation rule', 'validation rules'],
+    summary: 'A **validation rule** prevents bad data from being saved when a record does not meet a business condition.',
+    example: 'Require a Close Reason when an Opportunity stage changes to Closed Lost.',
+    uses: ['Improve data quality', 'Enforce required business rules', 'Show clear error messages to users'],
+    nextStep: 'Write the rule condition for the invalid case, then add a friendly error message.',
+  },
+  {
+    title: 'Flow in Salesforce',
+    topic: 'Salesforce System Administration',
+    aliases: ['flow', 'salesforce flow', 'record-triggered flow', 'screen flow'],
+    summary: '**Flow** is Salesforce automation that can update records, guide users through screens, and run business processes without Apex.',
+    example: 'A record-triggered flow can create a follow-up Task whenever a high-priority Case is opened.',
+    uses: ['Automate record updates', 'Build guided screen processes', 'Replace many workflow/process-builder automations'],
+    nextStep: 'Learn screen flows, record-triggered flows, entry conditions, fault paths, and debug runs.',
+  },
+  {
+    title: 'Apex in Salesforce',
+    topic: 'Apex',
+    aliases: ['apex', 'apex class', 'apex classes'],
+    summary: '**Apex** is Salesforce server-side programming language used for custom business logic and data operations.',
+    example: 'An Apex class can calculate a customer score and update related Account records after new data arrives.',
+    uses: ['Custom backend logic', 'Complex validations or integrations', 'Reusable services for triggers, flows, and LWCs'],
+    nextStep: 'Start with variables, data types, collections, classes, methods, SOQL, DML, and test classes.',
+  },
+  {
+    title: 'SOQL in Salesforce',
+    topic: 'Apex',
+    aliases: ['soql', 'salesforce object query language'],
+    summary: '**SOQL** is the query language used to read Salesforce records from objects and relationships.',
+    example: '`SELECT Id, Name FROM Account WHERE Industry = \'Technology\'` reads technology Account records.',
+    uses: ['Read records in Apex', 'Filter Salesforce data', 'Query parent or child relationships'],
+    nextStep: 'Practice SELECT, WHERE, LIMIT, relationship queries, and bulk-safe queries inside Apex.',
+  },
+  {
+    title: 'Apex trigger',
+    topic: 'Apex',
+    aliases: ['trigger', 'apex trigger', 'triggers'],
+    summary: 'An **Apex trigger** runs custom logic automatically before or after records are inserted, updated, deleted, or undeleted.',
+    example: 'A trigger can update Account summary fields when related Opportunity records change.',
+    uses: ['React to record changes', 'Enforce complex logic', 'Coordinate updates across related records'],
+    nextStep: 'Learn trigger context variables, bulk-safe loops, handler classes, recursion control, and tests.',
+  },
+  {
+    title: 'Governor limits in Apex',
+    topic: 'Apex',
+    aliases: ['governor limit', 'governor limits'],
+    summary: '**Governor limits** are Salesforce runtime limits that keep shared platform resources stable.',
+    example: 'A transaction can run only a limited number of SOQL queries, so code should query outside loops.',
+    uses: ['Write scalable Apex', 'Avoid runtime failures', 'Design bulk-safe triggers and services'],
+    nextStep: 'Learn the main SOQL, DML, CPU, heap, and callout limits, then practice bulk-safe patterns.',
+  },
+  {
+    title: 'Lightning Web Component',
+    topic: 'LWC',
+    aliases: ['lwc', 'lightning web component', 'lightning web components'],
+    summary: '**LWC** is Salesforce UI technology for building reusable web components with HTML, JavaScript, and metadata XML.',
+    example: 'An LWC can display learner progress, let a user select a topic, and call Apex to save the update.',
+    uses: ['Build Salesforce UI components', 'Create reusable Lightning pages', 'Connect user interfaces to Salesforce data'],
+    nextStep: 'Learn component files, templates, JavaScript properties, events, wire adapters, and Apex calls.',
+  },
+  {
+    title: 'Wire adapter in LWC',
+    topic: 'LWC',
+    aliases: ['wire adapter', 'wire adapters', '@wire', 'wire in lwc'],
+    summary: 'A **wire adapter** connects an LWC to Salesforce data or Apex reactively, so the component updates when inputs change.',
+    example: '`@wire(getRecord, { recordId: "$recordId", fields })` can load a record into a component.',
+    uses: ['Read Salesforce data', 'Call cacheable Apex', 'Keep UI data reactive'],
+    nextStep: 'Practice `getRecord`, `getObjectInfo`, wired Apex, and handling `data` and `error` states.',
+  },
+  {
+    title: 'Events in LWC',
+    topic: 'LWC',
+    aliases: ['event in lwc', 'events in lwc', 'custom event', 'custom events'],
+    summary: '**Events** let an LWC communicate user actions or data changes to another component.',
+    example: 'A child topic selector can dispatch a custom event when a learner chooses Apex, and the parent component can react.',
+    uses: ['Child-to-parent communication', 'Button and form interactions', 'Composable component design'],
+    nextStep: 'Practice `CustomEvent`, `dispatchEvent`, event detail payloads, and parent handlers.',
+  },
+  {
     title: 'Salesforce Data Cloud',
     topic: 'Data Cloud',
     aliases: ['data cloud', 'salesforce data cloud', 'customer data platform', 'cdp'],
@@ -253,12 +365,13 @@ Next step: ${concept.nextStep}`;
  */
 function buildSalesforceConceptCatalogResponse(learnerText) {
   const normalizedText = learnerText.toLowerCase();
-  const conceptsBySpecificity = [...SALESFORCE_CONCEPTS].sort(
-    (a, b) => Math.max(...b.aliases.map((alias) => alias.length)) - Math.max(...a.aliases.map((alias) => alias.length)),
+  const matches = SALESFORCE_CONCEPTS.flatMap((concept) =>
+    concept.aliases
+      .filter((alias) => includesConceptAlias(normalizedText, alias))
+      .map((alias) => ({ alias, concept })),
   );
-  const concept = conceptsBySpecificity.find(({ aliases }) =>
-    aliases.some((alias) => includesConceptAlias(normalizedText, alias)),
-  );
+  matches.sort((a, b) => b.alias.length - a.alias.length);
+  const concept = matches[0]?.concept;
 
   return concept ? formatSalesforceConceptResponse(concept) : null;
 }
