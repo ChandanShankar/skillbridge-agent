@@ -50,6 +50,78 @@ function buildFallbackHistory(inputItems, finalOutput) {
 }
 
 /**
+ * @param {string} learnerText
+ * @returns {string | null}
+ */
+function buildKnownSalesforceConceptResponse(learnerText) {
+  const normalizedText = learnerText.toLowerCase();
+
+  if (normalizedText.includes('permission set group')) {
+    return `**Permission set group in Salesforce**
+
+A **permission set group** combines multiple permission sets into one package that you can assign to users.
+
+Use it when a role needs several permission sets together, such as Sales Console access, report access, and custom object access.
+
+Next step: Create separate permission sets by responsibility, then group them for each job role.`;
+  }
+
+  if (normalizedText.includes('permission set')) {
+    return `**Permission set in Salesforce**
+
+A **permission set** is an extra bundle of access you can assign to a user without changing their profile.
+
+Think of the **profile** as the user's base access, and a **permission set** as an add-on pass for extra permissions.
+
+**Example**
+- A sales user profile may not allow exporting reports
+- You can give only selected users a permission set with **Export Reports**
+- Their profile stays the same, but they get that extra access
+
+**Common uses**
+- Give access to an app, object, field, tab, Apex class, or custom permission
+- Grant temporary or role-specific access
+- Avoid creating too many profiles
+
+Next step: Compare one user’s profile permissions with their assigned permission sets to see where their final access comes from.`;
+  }
+
+  if (normalizedText.includes('profile') && normalizedText.includes('salesforce')) {
+    return `**Profile in Salesforce**
+
+A **profile** defines a user's base permissions in Salesforce, such as what they can log into, which apps they can use, and their default access to objects, fields, tabs, and system permissions.
+
+In modern Salesforce security design, keep profiles simpler and use **permission sets** for extra access.
+
+Next step: Use profiles for baseline access and permission sets for additional role-based access.`;
+  }
+
+  if (normalizedText.includes('role') && normalizedText.includes('salesforce')) {
+    return `**Role in Salesforce**
+
+A **role** controls record visibility through the role hierarchy. It helps decide which records a user can see based on ownership and reporting structure.
+
+Simple difference:
+- **Profile/permission sets:** what a user can do
+- **Role:** which records a user can see
+
+Next step: Check whether the issue is about actions/permissions or record visibility before changing roles.`;
+  }
+
+  if (normalizedText.includes('sharing rule')) {
+    return `**Sharing rule in Salesforce**
+
+A **sharing rule** opens record access to users who would not normally see those records through org-wide defaults, role hierarchy, or ownership.
+
+Example: If Cases are private, a sharing rule can share high-priority Cases with a support manager group.
+
+Next step: First check org-wide defaults, then add sharing rules only where extra record access is needed.`;
+  }
+
+  return null;
+}
+
+/**
  * @param {string} finalOutput
  * @param {string} learnerText
  * @returns {boolean}
@@ -72,6 +144,9 @@ function shouldUseResilientResponse(finalOutput, learnerText) {
  */
 function buildResilientLearningResponse(learnerText) {
   const normalizedText = learnerText.toLowerCase();
+  const knownConceptResponse = buildKnownSalesforceConceptResponse(learnerText);
+  if (knownConceptResponse) return knownConceptResponse;
+
   const advancedDoubtTerms = [
     'integration',
     'production',
@@ -366,6 +441,15 @@ Next step: Retry your message in 1-2 minutes, or use one of the Apex demo prompt
  * @returns {Promise<{ finalOutput: string, history: Array<Record<string, any>> }>}
  */
 export async function runGeminiAgent(inputItems, systemPrompt) {
+  const learnerText = inputItemsToText(inputItems);
+  const knownConceptResponse = buildKnownSalesforceConceptResponse(learnerText);
+  if (knownConceptResponse) {
+    return {
+      finalOutput: knownConceptResponse,
+      history: buildFallbackHistory(inputItems, knownConceptResponse),
+    };
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is missing. Add it to `.env`, then restart the app.');
@@ -373,7 +457,6 @@ export async function runGeminiAgent(inputItems, systemPrompt) {
 
   const configuredModel = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
   const modelsToTry = [...new Set([configuredModel, ...FALLBACK_GEMINI_MODELS])];
-  const learnerText = inputItemsToText(inputItems);
   for (const model of modelsToTry) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt += 1) {
