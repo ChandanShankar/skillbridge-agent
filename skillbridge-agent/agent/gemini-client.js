@@ -83,7 +83,7 @@ Think of the **profile** as the user's base access, and a **permission set** as 
 - Grant temporary or role-specific access
 - Avoid creating too many profiles
 
-Next step: Compare one user’s profile permissions with their assigned permission sets to see where their final access comes from.`;
+Next step: Compare one user's profile permissions with their assigned permission sets to see where their final access comes from.`;
   }
 
   if (normalizedText.includes('profile') && normalizedText.includes('salesforce')) {
@@ -122,11 +122,34 @@ Next step: First check org-wide defaults, then add sharing rules only where extr
 }
 
 /**
+ * @param {string} normalizedText
+ * @returns {boolean}
+ */
+function asksForComparison(normalizedText) {
+  return /\b(?:difference|different|compare|comparison|vs|versus|distinguish|differ)\b/i.test(normalizedText);
+}
+
+/**
  * @typedef {{ title: string, topic: string, aliases: string[], summary: string, example: string, uses: string[], nextStep: string }} SalesforceConcept
  */
 
 /** @type {SalesforceConcept[]} */
 const SALESFORCE_CONCEPTS = [
+  {
+    title: 'Profile in Salesforce',
+    topic: 'Salesforce Admin',
+    aliases: ['profile', 'profiles'],
+    summary:
+      "A **profile** defines a user's baseline access in Salesforce. Every user must have exactly one profile.",
+    example:
+      'A Sales User profile can give baseline access to sales apps, tabs, objects, fields, and system permissions.',
+    uses: [
+      'Give every user a required baseline access model',
+      'Control broad access such as apps, tabs, objects, fields, and system permissions',
+      'Keep job-type access simple before adding permission sets',
+    ],
+    nextStep: 'Use profiles for baseline access, then add permission sets for extra role-based access.',
+  },
   {
     title: 'Permission set in Salesforce',
     topic: 'Salesforce Admin',
@@ -327,6 +350,436 @@ const SALESFORCE_CONCEPTS = [
     uses: ['AI-assisted CRM work', 'Guided actions', 'Service, sales, and internal productivity use cases'],
     nextStep: 'Learn topics, actions, grounding data, testing, and guardrails before building a production agent.',
   },
+  {
+    title: 'Salesforce Platform Fundamentals',
+    topic: 'Salesforce Admin',
+    aliases: ['salesforce platform fundamentals', 'platform fundamentals', 'salesforce basics', 'salesforce fundamentals'],
+    summary:
+      '**Salesforce platform fundamentals** explain how Salesforce stores data, secures access, automates work, and presents apps to users.',
+    example: 'Accounts, Contacts, record pages, profiles, flows, reports, and apps all work together on the Salesforce platform.',
+    uses: ['Understand the core Salesforce building blocks', 'Prepare for admin, developer, and consultant paths', 'Troubleshoot user and data issues'],
+    nextStep: 'Start with objects, records, fields, security, automation, and reporting.',
+  },
+  {
+    title: 'Objects, Fields, Relationships, and Records',
+    topic: 'Salesforce Admin',
+    aliases: ['objects fields relationships records', 'object field relationship record', 'objects', 'fields', 'relationships', 'records'],
+    summary:
+      '**Objects, fields, relationships, and records** are the main Salesforce data model pieces: objects are tables, fields are columns, records are rows, and relationships connect objects.',
+    example: 'An Account object can have Account records, fields like Industry, and related Contact records.',
+    uses: ['Design a Salesforce data model', 'Build custom apps', 'Understand where business data lives'],
+    nextStep: 'Practice creating a custom object, fields, and a lookup or master-detail relationship.',
+  },
+  {
+    title: 'Roles and Sharing in Salesforce',
+    topic: 'Salesforce Admin',
+    aliases: ['roles and sharing', 'role hierarchy', 'sharing', 'sharing model', 'record sharing'],
+    summary:
+      '**Roles and sharing** control which records users can see, usually through role hierarchy, org-wide defaults, sharing rules, teams, and manual sharing.',
+    example: 'If Opportunities are private, a manager may see team opportunities through the role hierarchy.',
+    uses: ['Control record visibility', 'Open access without changing object permissions', 'Design secure sharing models'],
+    nextStep: 'Separate object permissions from record visibility before changing access settings.',
+  },
+  {
+    title: 'Reports and Dashboards in Salesforce',
+    topic: 'Salesforce Admin',
+    aliases: ['reports and dashboards', 'report', 'reports', 'dashboard', 'dashboards'],
+    summary:
+      '**Reports and dashboards** turn Salesforce records into lists, summaries, charts, and business metrics.',
+    example: 'A sales dashboard can show pipeline by stage, closed revenue, and activities by owner.',
+    uses: ['Analyze Salesforce data', 'Track team performance', 'Share metrics with managers and users'],
+    nextStep: 'Learn report types, filters, groupings, summary formulas, charts, and dashboard components.',
+  },
+  {
+    title: 'Data Import, Export, and Security',
+    topic: 'Salesforce Admin',
+    aliases: ['data import', 'data export', 'import export security', 'data security', 'import wizard', 'data loader'],
+    summary:
+      '**Data import, export, and security** covers moving data into or out of Salesforce while protecting access and data quality.',
+    example: 'An admin can load Accounts with Data Loader, export backup data, and restrict sensitive fields with field-level security.',
+    uses: ['Migrate or clean data', 'Back up business records', 'Protect sensitive data during admin work'],
+    nextStep: 'Practice import templates, external IDs, duplicate checks, and field-level security review.',
+  },
+  {
+    title: 'App Builder and Page Layouts',
+    topic: 'Salesforce Admin',
+    aliases: ['app builder', 'lightning app builder', 'page layout', 'page layouts', 'record page'],
+    summary:
+      '**App Builder and page layouts** control how Salesforce apps and record pages appear to users.',
+    example: 'A recruiter record page can show highlights, related lists, actions, and a custom LWC component.',
+    uses: ['Customize user experience', 'Show the right fields and actions', 'Build role-friendly record pages'],
+    nextStep: 'Compare Lightning record pages, page layouts, dynamic forms, and compact layouts.',
+  },
+  {
+    title: 'Apex Syntax and Data Types',
+    topic: 'Apex',
+    aliases: ['apex syntax', 'apex data types', 'data types in apex', 'apex variables'],
+    summary:
+      '**Apex syntax and data types** are the foundation for writing Salesforce server-side code with variables, conditions, loops, methods, and typed values.',
+    example: '`String name = \'Acme\'; Integer count = 5;` stores text and number values in Apex.',
+    uses: ['Write basic Apex logic', 'Understand classes and triggers', 'Prepare for SOQL and DML'],
+    nextStep: 'Practice variables, if-else, loops, methods, and primitive data types.',
+  },
+  {
+    title: 'Apex Collections',
+    topic: 'Apex',
+    aliases: ['collections', 'list set map', 'list in apex', 'set in apex', 'map in apex'],
+    summary:
+      '**Apex collections** store groups of values or records. The main collection types are List, Set, and Map.',
+    example: 'A `Map<Id, Account>` lets code quickly find Account records by Id.',
+    uses: ['Process many records safely', 'Avoid duplicate values', 'Look up records efficiently'],
+    nextStep: 'Practice List ordering, Set uniqueness, and Map key-value lookup.',
+  },
+  {
+    title: 'SOSL in Salesforce',
+    topic: 'Apex',
+    aliases: ['sosl', 'salesforce object search language'],
+    summary:
+      '**SOSL** searches text across multiple Salesforce objects, unlike SOQL which queries specific objects and fields.',
+    example: '`FIND {Acme} IN ALL FIELDS RETURNING Account(Name), Contact(Name)` searches Accounts and Contacts.',
+    uses: ['Search across objects', 'Build keyword search features', 'Find records when the exact object is unclear'],
+    nextStep: 'Compare SOQL filtering with SOSL keyword search, then practice both.',
+  },
+  {
+    title: 'DML Operations in Apex',
+    topic: 'Apex',
+    aliases: ['dml', 'dml operations', 'insert update delete undelete upsert'],
+    summary:
+      '**DML operations** save changes to Salesforce records from Apex, such as insert, update, delete, undelete, and upsert.',
+    example: '`insert new Account(Name = \'Acme\');` creates an Account record.',
+    uses: ['Create and update records', 'Automate data changes', 'Build trigger and service logic'],
+    nextStep: 'Practice DML with lists of records and learn how to handle partial failures.',
+  },
+  {
+    title: 'Apex Trigger Frameworks',
+    topic: 'Apex',
+    aliases: ['trigger framework', 'trigger frameworks', 'apex trigger framework'],
+    summary:
+      '**Apex trigger frameworks** organize trigger logic into reusable handler classes so code stays bulk-safe and maintainable.',
+    example: 'A trigger can delegate Account logic to `AccountTriggerHandler.beforeUpdate()` instead of putting all logic in the trigger file.',
+    uses: ['Keep trigger logic organized', 'Prevent duplicated code', 'Support testing and recursion control'],
+    nextStep: 'Learn one-trigger-per-object, handler classes, context methods, and recursion guards.',
+  },
+  {
+    title: 'Apex Classes and Interfaces',
+    topic: 'Apex',
+    aliases: ['apex classes', 'apex class', 'interfaces', 'apex interface', 'classes and interfaces'],
+    summary:
+      '**Apex classes and interfaces** define reusable code. Classes hold logic and data, while interfaces define method contracts.',
+    example: 'A payment service class can implement an interface so different payment providers follow the same method shape.',
+    uses: ['Create reusable services', 'Organize business logic', 'Support testable and flexible designs'],
+    nextStep: 'Practice classes, constructors, static methods, instance methods, inheritance, and interfaces.',
+  },
+  {
+    title: 'Async Apex',
+    topic: 'Apex',
+    aliases: ['batch apex', 'queueable apex', 'scheduled apex', 'async apex', 'future method', 'future methods'],
+    summary:
+      '**Async Apex** runs work outside the current transaction using Batch, Queueable, Scheduled, or Future Apex.',
+    example: 'A nightly Scheduled Apex job can start a Batch Apex process to update thousands of records.',
+    uses: ['Process large data volumes', 'Run long-running jobs', 'Schedule background automation'],
+    nextStep: 'Learn when to use Batch, Queueable, Scheduled, and Future Apex.',
+  },
+  {
+    title: 'Apex Exception Handling',
+    topic: 'Apex',
+    aliases: ['exception handling', 'apex exception', 'try catch'],
+    summary:
+      '**Apex exception handling** uses try-catch blocks and custom exceptions to handle errors gracefully.',
+    example: 'A service can catch a DML exception and return a user-friendly message instead of failing silently.',
+    uses: ['Prevent unclear failures', 'Handle DML and callout errors', 'Create safer service logic'],
+    nextStep: 'Practice try-catch-finally, custom exceptions, and meaningful error messages.',
+  },
+  {
+    title: 'Test Classes and Code Coverage',
+    topic: 'Apex',
+    aliases: ['test class', 'test classes', 'code coverage', 'apex testing'],
+    summary:
+      '**Test classes and code coverage** verify Apex behavior and are required for production deployment.',
+    example: 'A test creates sample Accounts, runs the service method, and asserts that the output is correct.',
+    uses: ['Validate Apex logic', 'Deploy code safely', 'Prevent regressions'],
+    nextStep: 'Practice test data setup, assertions, positive tests, negative tests, and bulk tests.',
+  },
+  {
+    title: 'LWC Properties and Decorators',
+    topic: 'LWC',
+    aliases: ['properties and decorators', 'decorators', '@api', '@track', '@wire'],
+    summary:
+      '**LWC properties and decorators** control component state, public APIs, and reactive data wiring.',
+    example: '`@api recordId` lets a Lightning page pass the current record Id into a component.',
+    uses: ['Pass data into components', 'Manage reactive state', 'Connect components to Salesforce data'],
+    nextStep: 'Practice `@api`, reactive fields, getters, and `@wire`.',
+  },
+  {
+    title: 'Calling Apex from LWC',
+    topic: 'LWC',
+    aliases: ['calling apex from lwc', 'imperative apex', 'apex from lwc', 'call apex'],
+    summary:
+      '**Calling Apex from LWC** lets a component run server-side Salesforce logic using wired or imperative Apex methods.',
+    example: 'A search component can call an Apex method when a user enters a keyword.',
+    uses: ['Read custom Salesforce data', 'Run server-side business logic', 'Support complex UI workflows'],
+    nextStep: 'Learn cacheable wired methods, imperative calls, loading states, and error handling.',
+  },
+  {
+    title: 'Lightning Data Service',
+    topic: 'LWC',
+    aliases: ['lightning data service', 'lds', 'record operations'],
+    summary:
+      '**Lightning Data Service** lets LWCs read, create, edit, and delete Salesforce records without custom Apex for common record operations.',
+    example: '`lightning-record-edit-form` can edit a record using Salesforce metadata and security.',
+    uses: ['Build record forms', 'Respect sharing and field security', 'Reduce custom Apex code'],
+    nextStep: 'Practice `getRecord`, `updateRecord`, and base record form components.',
+  },
+  {
+    title: 'Navigation and Toast Messages in LWC',
+    topic: 'LWC',
+    aliases: ['navigation', 'toast', 'toast message', 'toast messages', 'showtoast'],
+    summary:
+      '**Navigation and toast messages** help LWCs move users to pages and show success, warning, or error feedback.',
+    example: 'After saving a record, an LWC can show a success toast and navigate to the record page.',
+    uses: ['Improve user feedback', 'Guide users through workflows', 'Link components to Salesforce pages'],
+    nextStep: 'Practice `NavigationMixin` and `ShowToastEvent` with success and error paths.',
+  },
+  {
+    title: 'LWC Lifecycle Hooks',
+    topic: 'LWC',
+    aliases: ['lifecycle hook', 'lifecycle hooks', 'connectedcallback', 'renderedcallback', 'disconnectedcallback'],
+    summary:
+      '**LWC lifecycle hooks** are methods that run when a component is inserted, rendered, updated, or removed.',
+    example: '`connectedCallback()` can initialize component state when the component loads.',
+    uses: ['Initialize components', 'React after rendering', 'Clean up listeners or timers'],
+    nextStep: 'Learn `constructor`, `connectedCallback`, `renderedCallback`, and `disconnectedCallback`.',
+  },
+  {
+    title: 'Agentforce Topics, Actions, and Instructions',
+    topic: 'Agentforce',
+    aliases: ['agent topics actions instructions', 'topics actions instructions', 'agent topics', 'agent actions', 'agent instructions'],
+    summary:
+      '**Agentforce topics, actions, and instructions** define what an agent can discuss, what it can do, and how it should behave.',
+    example: 'A service agent topic can include instructions for handling refund questions and actions that open a case.',
+    uses: ['Design agent behavior', 'Connect agents to business actions', 'Keep AI responses focused'],
+    nextStep: 'Draft topics first, then map each topic to actions and guardrail instructions.',
+  },
+  {
+    title: 'Prompt Templates in Agentforce',
+    topic: 'Agentforce',
+    aliases: ['prompt template', 'prompt templates'],
+    summary:
+      '**Prompt templates** provide reusable instructions and merge data for consistent AI-generated outputs.',
+    example: 'A case summary prompt template can include case fields and ask the AI to summarize customer history.',
+    uses: ['Standardize AI prompts', 'Ground responses with record data', 'Reduce repeated prompt writing'],
+    nextStep: 'Practice writing templates with clear task, context, constraints, and output format.',
+  },
+  {
+    title: 'Grounding Agents with Salesforce Data',
+    topic: 'Agentforce',
+    aliases: ['grounding', 'grounding agents', 'grounding agents with salesforce data', 'salesforce data grounding'],
+    summary:
+      '**Grounding agents with Salesforce data** means giving agents trusted CRM context so answers and actions are based on real records.',
+    example: 'A service agent can use Case, Contact, and Knowledge data before suggesting a response.',
+    uses: ['Improve answer accuracy', 'Use CRM context safely', 'Reduce generic AI responses'],
+    nextStep: 'Identify the objects, fields, permissions, and policies the agent needs before testing.',
+  },
+  {
+    title: 'Data Cloud Architecture',
+    topic: 'Data Cloud',
+    aliases: ['data cloud architecture', 'data cloud fundamentals'],
+    summary:
+      '**Data Cloud architecture** connects source data, harmonized data models, identity resolution, insights, segments, and activations.',
+    example: 'Data can flow from CRM and web systems into Data Cloud, map to model objects, unify identities, and activate segments.',
+    uses: ['Understand Data Cloud end to end', 'Plan integrations', 'Support personalization and AI use cases'],
+    nextStep: 'Learn data streams, DLOs, DMOs, identity resolution, insights, segments, and activation.',
+  },
+  {
+    title: 'Data Streams and Data Ingestion',
+    topic: 'Data Cloud',
+    aliases: ['data streams', 'data stream', 'data ingestion', 'ingestion'],
+    summary:
+      '**Data streams and ingestion** bring source data into Data Cloud from Salesforce and external systems.',
+    example: 'A CRM data stream can bring Contact records into Data Cloud for unification and segmentation.',
+    uses: ['Connect source systems', 'Load customer data', 'Keep Data Cloud updated'],
+    nextStep: 'Practice source setup, field mapping, refresh schedules, and ingestion monitoring.',
+  },
+  {
+    title: 'Data Lake Objects and Data Model Objects',
+    topic: 'Data Cloud',
+    aliases: ['data lake object', 'data lake objects', 'dlo', 'dlos', 'data model object', 'data model objects', 'dmo', 'dmos'],
+    summary:
+      '**Data Lake Objects and Data Model Objects** represent raw ingested data and harmonized business data in Data Cloud.',
+    example: 'A source customer table may land as a DLO and then map into an Individual or Contact Point DMO.',
+    uses: ['Understand raw vs harmonized data', 'Map source fields correctly', 'Prepare data for identity and segmentation'],
+    nextStep: 'Learn how DLO fields map to DMO fields in the Data Cloud data model.',
+  },
+  {
+    title: 'Identity Resolution in Data Cloud',
+    topic: 'Data Cloud',
+    aliases: ['identity resolution', 'identity rules', 'unified profile'],
+    summary:
+      '**Identity resolution** matches data from different sources to create a unified customer profile.',
+    example: 'Email, phone, loyalty ID, and CRM ID can help Data Cloud connect multiple records to one person.',
+    uses: ['Unify customer identities', 'Reduce duplicate profiles', 'Improve segmentation and personalization'],
+    nextStep: 'Learn matching rules, reconciliation rules, and profile review.',
+  },
+  {
+    title: 'Calculated Insights in Data Cloud',
+    topic: 'Data Cloud',
+    aliases: ['calculated insight', 'calculated insights'],
+    summary:
+      '**Calculated insights** are metrics computed from Data Cloud data, such as lifetime value, purchase count, or last activity date.',
+    example: 'A calculated insight can compute total purchases for each unified customer.',
+    uses: ['Create customer metrics', 'Power segmentation', 'Support analytics and AI decisions'],
+    nextStep: 'Practice defining measures, dimensions, joins, and refresh behavior.',
+  },
+  {
+    title: 'Segmentation and Activation in Data Cloud',
+    topic: 'Data Cloud',
+    aliases: ['segmentation', 'segments', 'activation target', 'activation targets', 'activation'],
+    summary:
+      '**Segmentation and activation** group audiences in Data Cloud and send them to destinations for campaigns, personalization, or workflows.',
+    example: 'A segment of high-value customers can activate to Marketing Cloud for a retention journey.',
+    uses: ['Build audience groups', 'Activate data to channels', 'Personalize customer experiences'],
+    nextStep: 'Practice segment rules, publish timing, and activation target setup.',
+  },
+  {
+    title: 'PMP Project Lifecycle',
+    topic: 'PMP and Project Management',
+    aliases: ['project lifecycle', 'pmp lifecycle', 'project management lifecycle'],
+    summary:
+      '**The project lifecycle** describes how a project moves from initiation to planning, execution, monitoring and control, and closure.',
+    example: 'A CRM rollout project starts with a charter, moves into planning, executes configuration, tracks risks, and closes with handover.',
+    uses: ['Structure project work', 'Plan phases and deliverables', 'Prepare for PMP exam scenarios'],
+    nextStep: 'Learn each phase with its key documents, decisions, and outputs.',
+  },
+  {
+    title: 'Project Initiation and Planning',
+    topic: 'PMP and Project Management',
+    aliases: ['project initiation', 'project planning', 'initiation and planning'],
+    summary:
+      '**Project initiation and planning** define why the project exists, who is involved, what will be delivered, and how work will be managed.',
+    example: 'A project charter authorizes the project, while the plan defines scope, schedule, cost, quality, risk, and communication approach.',
+    uses: ['Align stakeholders', 'Define scope and objectives', 'Create a realistic delivery plan'],
+    nextStep: 'Practice charter, stakeholder register, scope statement, WBS, schedule, budget, and risk register.',
+  },
+  {
+    title: 'Scope, Schedule, and Cost Management',
+    topic: 'PMP and Project Management',
+    aliases: ['scope management', 'schedule management', 'cost management', 'scope schedule cost'],
+    summary:
+      '**Scope, schedule, and cost management** define what will be delivered, when it will be delivered, and what it will cost.',
+    example: 'Adding a new feature may increase scope, affect the schedule, and raise project cost.',
+    uses: ['Control project constraints', 'Manage tradeoffs', 'Prevent uncontrolled changes'],
+    nextStep: 'Learn WBS, critical path, estimates, baselines, variance, and change control.',
+  },
+  {
+    title: 'Risk Management',
+    topic: 'PMP and Project Management',
+    aliases: ['risk management', 'risk register', 'risk response'],
+    summary:
+      '**Risk management** identifies uncertain events, analyzes their impact, and plans responses before they become issues.',
+    example: 'If a key developer may be unavailable, the project can plan cross-training as a risk response.',
+    uses: ['Reduce project surprises', 'Plan mitigation and contingency', 'Improve decision-making'],
+    nextStep: 'Practice risk identification, probability-impact analysis, response planning, and risk monitoring.',
+  },
+  {
+    title: 'Stakeholder and Communication Management',
+    topic: 'PMP and Project Management',
+    aliases: ['stakeholder management', 'communication management', 'communications management'],
+    summary:
+      '**Stakeholder and communication management** ensures the right people are engaged and receive the right information at the right time.',
+    example: 'Executives may need weekly status summaries, while the delivery team needs daily task updates.',
+    uses: ['Manage expectations', 'Reduce confusion', 'Improve project support and adoption'],
+    nextStep: 'Create a stakeholder register, engagement plan, and communication plan.',
+  },
+  {
+    title: 'Agile, Scrum, and Hybrid Methodologies',
+    topic: 'PMP and Project Management',
+    aliases: ['agile', 'scrum', 'hybrid methodology', 'hybrid methodologies', 'agile scrum hybrid'],
+    summary:
+      '**Agile, Scrum, and hybrid methodologies** are delivery approaches for managing work iteratively, predictively, or with a mix of both.',
+    example: 'A team may use Scrum sprints for product features and predictive planning for compliance milestones.',
+    uses: ['Choose the right delivery approach', 'Manage changing requirements', 'Prepare for PMP agile questions'],
+    nextStep: 'Compare predictive, adaptive, and hybrid delivery with real project examples.',
+  },
+  {
+    title: 'Project Monitoring, Control, and Closure',
+    topic: 'PMP and Project Management',
+    aliases: ['monitoring and control', 'project monitoring', 'project control', 'project closure', 'closure'],
+    summary:
+      '**Monitoring, control, and closure** track project performance, handle changes, and formally complete the project.',
+    example: 'A project manager tracks schedule variance, manages change requests, gets acceptance, and captures lessons learned.',
+    uses: ['Control project performance', 'Handle change requests', 'Close projects properly'],
+    nextStep: 'Learn performance reporting, change control, acceptance, handover, and lessons learned.',
+  },
+  {
+    title: 'PMP Exam Preparation Concepts',
+    topic: 'PMP and Project Management',
+    aliases: ['pmp exam', 'pmp exam preparation', 'pmp prep', 'pmp concepts'],
+    summary:
+      '**PMP exam preparation concepts** cover people, process, and business environment topics across predictive, agile, and hybrid projects.',
+    example: 'A PMP question may ask whether the project manager should update the risk register, consult stakeholders, or raise a change request.',
+    uses: ['Prepare for PMP certification', 'Practice scenario questions', 'Learn PMI-style decision-making'],
+    nextStep: 'Study one domain at a time, then practice scenario questions with explanations.',
+  },
+  {
+    title: 'SAP Fundamentals',
+    topic: 'SAP',
+    aliases: ['sap fundamentals', 'sap basics', 'what is sap', 'sap'],
+    summary:
+      '**SAP fundamentals** explain how SAP ERP systems support business processes such as finance, procurement, sales, production, and HR.',
+    example: 'A sales order in SAP can connect customer data, pricing, inventory, delivery, billing, and finance postings.',
+    uses: ['Understand ERP business processes', 'Prepare for SAP functional or technical learning', 'Connect modules end to end'],
+    nextStep: 'Start with ERP concepts, organizational structure, master data, transactions, and core modules.',
+  },
+  {
+    title: 'SAP ERP Modules',
+    topic: 'SAP',
+    aliases: ['sap modules', 'erp modules', 'sap fico', 'fico', 'sap mm', 'sap sd', 'sap hcm', 'sap pp'],
+    summary:
+      '**SAP ERP modules** organize business capabilities such as Finance (FICO), Materials Management (MM), Sales and Distribution (SD), HR (HCM), and Production Planning (PP).',
+    example: 'A procure-to-pay process often uses MM for purchasing and FICO for vendor invoice and payment postings.',
+    uses: ['Choose a SAP learning path', 'Understand business process ownership', 'Connect cross-module workflows'],
+    nextStep: 'Pick one module, then learn its master data, transactions, configuration basics, and process flow.',
+  },
+  {
+    title: 'SAP S/4HANA',
+    topic: 'SAP',
+    aliases: ['s/4hana', 'sap s/4hana', 's4hana'],
+    summary:
+      "**SAP S/4HANA** is SAP's modern ERP suite built on the HANA database with simplified data models and Fiori user experiences.",
+    example: 'A company may move from SAP ECC to S/4HANA to modernize finance, logistics, reporting, and user experience.',
+    uses: ['Modern ERP implementation', 'Real-time operational reporting', 'Simplified SAP business processes'],
+    nextStep: 'Learn S/4HANA basics, Fiori apps, migration concepts, and module-specific changes.',
+  },
+  {
+    title: 'ABAP Basics',
+    topic: 'SAP',
+    aliases: ['abap', 'abap basics', 'sap abap'],
+    summary:
+      "**ABAP** is SAP's programming language for custom reports, enhancements, interfaces, forms, and backend business logic.",
+    example: 'An ABAP report can read sales orders and display filtered business data for users.',
+    uses: ['Build SAP custom logic', 'Create reports and enhancements', 'Support SAP technical development'],
+    nextStep: 'Practice ABAP syntax, internal tables, Open SQL, reports, function modules, classes, and debugging.',
+  },
+  {
+    title: 'SAP Master Data and Transactions',
+    topic: 'SAP',
+    aliases: ['sap master data', 'master data', 'transaction code', 'transaction codes', 'tcode', 'tcodes'],
+    summary:
+      '**SAP master data and transactions** are the stable business records and day-to-day activities used in SAP processes.',
+    example: 'A material master stores product details, while a purchase order transaction records a procurement activity.',
+    uses: ['Run SAP business processes', 'Understand process dependencies', 'Troubleshoot data issues'],
+    nextStep: 'Learn the master data and common transaction codes for the SAP module you are studying.',
+  },
+  {
+    title: 'SAP Security Roles and Authorizations',
+    topic: 'SAP',
+    aliases: ['sap security', 'sap roles', 'sap authorizations', 'roles and authorizations'],
+    summary:
+      '**SAP security roles and authorizations** control which transactions, apps, and data a user can access.',
+    example: 'A purchasing user may have access to create purchase orders but not approve payments.',
+    uses: ['Protect business processes', 'Control user access', 'Support compliance and audits'],
+    nextStep: 'Learn users, roles, authorization objects, segregation of duties, and access review basics.',
+  },
 ];
 
 /**
@@ -360,19 +813,78 @@ Next step: ${concept.nextStep}`;
 }
 
 /**
+ * @param {SalesforceConcept} concept
+ * @returns {string}
+ */
+function shortConceptTitle(concept) {
+  return concept.title.replace(/\s+in Salesforce$/i, '');
+}
+
+/**
+ * @param {SalesforceConcept[]} concepts
+ * @returns {string}
+ */
+function formatSalesforceConceptComparisonResponse(concepts) {
+  const [firstConcept, secondConcept] = concepts;
+  const firstTitle = shortConceptTitle(firstConcept);
+  const secondTitle = shortConceptTitle(secondConcept);
+
+  return `**${firstTitle} vs ${secondTitle}**
+
+Topic: **${firstConcept.topic === secondConcept.topic ? firstConcept.topic : 'Salesforce'}**
+
+${firstConcept.summary}
+
+${secondConcept.summary}
+
+**Key differences**
+- **${firstTitle}:** ${firstConcept.uses[0]}
+- **${secondTitle}:** ${secondConcept.uses[0]}
+- **${firstTitle}:** ${firstConcept.uses[1]}
+- **${secondTitle}:** ${secondConcept.uses[1]}
+
+**Example**
+${firstConcept.example}
+
+${secondConcept.example}
+
+Next step: Review both concepts together and decide which one controls the process, access, data, delivery approach, or technical behavior in your scenario.`;
+}
+
+/**
+ * @param {string} normalizedText
+ * @returns {Array<{ alias: string, concept: SalesforceConcept }>}
+ */
+function findSalesforceConceptMatches(normalizedText) {
+  return SALESFORCE_CONCEPTS.flatMap((concept) =>
+    concept.aliases
+      .filter((alias) => includesConceptAlias(normalizedText, alias))
+      .map((alias) => ({ alias, concept })),
+  ).sort((a, b) => b.alias.length - a.alias.length);
+}
+
+/**
+ * @param {Array<{ concept: SalesforceConcept }>} matches
+ * @returns {SalesforceConcept[]}
+ */
+function uniqueMatchedConcepts(matches) {
+  return [...new Map(matches.map((match) => [match.concept.title, match.concept])).values()];
+}
+
+/**
  * @param {string} learnerText
  * @returns {string | null}
  */
 function buildSalesforceConceptCatalogResponse(learnerText) {
   const normalizedText = learnerText.toLowerCase();
-  const matches = SALESFORCE_CONCEPTS.flatMap((concept) =>
-    concept.aliases
-      .filter((alias) => includesConceptAlias(normalizedText, alias))
-      .map((alias) => ({ alias, concept })),
-  );
-  matches.sort((a, b) => b.alias.length - a.alias.length);
-  const concept = matches[0]?.concept;
+  const matches = findSalesforceConceptMatches(normalizedText);
+  const matchedConcepts = uniqueMatchedConcepts(matches);
 
+  if (asksForComparison(normalizedText) && matchedConcepts.length >= 2) {
+    return formatSalesforceConceptComparisonResponse(matchedConcepts.slice(0, 2));
+  }
+
+  const concept = matches[0]?.concept;
   return concept ? formatSalesforceConceptResponse(concept) : null;
 }
 

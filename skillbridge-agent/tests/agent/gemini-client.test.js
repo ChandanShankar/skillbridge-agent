@@ -13,6 +13,42 @@ describe('runGeminiAgent known Salesforce concepts', () => {
     assert.match(result.finalOutput, /without changing their profile/);
   });
 
+  it('compares permission sets and profiles when asked for the difference', async () => {
+    const result = await runGeminiAgent('permission set and profile difference', 'test prompt');
+
+    assert.match(result.finalOutput, /Permission set vs Profile|Profile vs Permission set/);
+    assert.match(result.finalOutput, /Topic: \*\*Salesforce Admin\*\*/);
+    assert.match(result.finalOutput, /baseline access/);
+    assert.match(result.finalOutput, /extra bundle of access/);
+    assert.match(result.finalOutput, /Key differences/);
+    assert.match(result.finalOutput, /Example/);
+  });
+
+  it('compares other known Salesforce concepts generically', async () => {
+    const result = await runGeminiAgent('SOQL vs SOSL difference', 'test prompt');
+
+    assert.match(result.finalOutput, /SOQL vs SOSL|SOSL vs SOQL/);
+    assert.match(result.finalOutput, /Topic: \*\*Apex\*\*/);
+    assert.match(result.finalOutput, /queries specific objects|searches text across multiple Salesforce objects/);
+    assert.match(result.finalOutput, /Key differences/);
+  });
+
+  it('answers PMP concept questions directly', async () => {
+    const result = await runGeminiAgent('What is risk management in PMP?', 'test prompt');
+
+    assert.match(result.finalOutput, /Risk Management/);
+    assert.match(result.finalOutput, /Topic: \*\*PMP and Project Management\*\*/);
+    assert.match(result.finalOutput, /identifies uncertain events/);
+  });
+
+  it('answers SAP concept questions directly', async () => {
+    const result = await runGeminiAgent('Explain SAP S/4HANA', 'test prompt');
+
+    assert.match(result.finalOutput, /SAP S\/4HANA/);
+    assert.match(result.finalOutput, /Topic: \*\*SAP\*\*/);
+    assert.match(result.finalOutput, /modern ERP suite/);
+  });
+
   it('distinguishes permission set groups from permission sets', async () => {
     const result = await runGeminiAgent('What is permission set group in Salesforce?', 'test prompt');
 
