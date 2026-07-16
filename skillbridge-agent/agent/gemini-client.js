@@ -122,6 +122,148 @@ Next step: First check org-wide defaults, then add sharing rules only where extr
 }
 
 /**
+ * @typedef {{ title: string, topic: string, aliases: string[], summary: string, example: string, uses: string[], nextStep: string }} SalesforceConcept
+ */
+
+/** @type {SalesforceConcept[]} */
+const SALESFORCE_CONCEPTS = [
+  {
+    title: 'Permission set in Salesforce',
+    topic: 'Salesforce Admin',
+    aliases: ['permission set', 'permission sets'],
+    summary: 'A **permission set** is an extra bundle of access you can assign to a user without changing their profile.',
+    example:
+      'A sales user profile may not allow exporting reports. You can give only selected users a permission set with **Export Reports**, while their profile stays the same.',
+    uses: [
+      'Give access to an app, object, field, tab, Apex class, or custom permission',
+      'Grant temporary or role-specific access',
+      'Avoid creating too many profiles',
+    ],
+    nextStep: 'Compare one user profile with their assigned permission sets to see where their final access comes from.',
+  },
+  {
+    title: 'Permission set group in Salesforce',
+    topic: 'Salesforce Admin',
+    aliases: ['permission set group', 'permission set groups'],
+    summary: 'A **permission set group** combines multiple permission sets into one package that you can assign to users.',
+    example:
+      'A sales operations user might need Sales Console access, report export access, and custom object access. A permission set group can bundle those together.',
+    uses: ['Assign a role-based access package', 'Keep permission sets modular', 'Make user access easier to review'],
+    nextStep: 'Create separate permission sets by responsibility, then group them for each job role.',
+  },
+  {
+    title: 'Salesforce Data Cloud',
+    topic: 'Data Cloud',
+    aliases: ['data cloud', 'salesforce data cloud', 'customer data platform', 'cdp'],
+    summary:
+      '**Salesforce Data Cloud** brings customer data from different systems together so teams can unify profiles, segment audiences, and activate data across Salesforce.',
+    example: 'A customer profile can combine CRM records, website behavior, purchase history, and support activity into one unified view.',
+    uses: ['Unify customer profiles', 'Create segments', 'Power personalization, analytics, and AI use cases'],
+    nextStep: 'Start by learning data streams, data model objects, identity resolution, calculated insights, and segments.',
+  },
+  {
+    title: 'Sales Cloud',
+    topic: 'Salesforce Clouds',
+    aliases: ['sales cloud'],
+    summary: '**Sales Cloud** helps sales teams manage leads, accounts, contacts, opportunities, forecasts, and pipeline activity.',
+    example: 'A sales rep can convert a Lead, track an Opportunity, and update the deal stage until it closes.',
+    uses: ['Lead and opportunity management', 'Sales forecasting', 'Pipeline reporting'],
+    nextStep: 'Learn Lead, Account, Contact, Opportunity, Product, Quote, and Forecast objects first.',
+  },
+  {
+    title: 'Service Cloud',
+    topic: 'Salesforce Clouds',
+    aliases: ['service cloud'],
+    summary: '**Service Cloud** helps support teams manage customer cases, knowledge articles, service channels, and agent productivity.',
+    example: 'A support agent can receive a Case, use Knowledge to answer it, and track service-level progress.',
+    uses: ['Case management', 'Knowledge base support', 'Omni-channel service operations'],
+    nextStep: 'Learn Cases, queues, assignment rules, escalation rules, Knowledge, and Omni-Channel.',
+  },
+  {
+    title: 'Marketing Cloud',
+    topic: 'Salesforce Clouds',
+    aliases: ['marketing cloud'],
+    summary: '**Marketing Cloud** helps teams design customer journeys, send campaigns, personalize messages, and measure engagement.',
+    example: 'A marketer can send a welcome journey after a customer signs up and personalize follow-up messages.',
+    uses: ['Email and journey automation', 'Audience segmentation', 'Campaign analytics'],
+    nextStep: 'Start with contacts, data extensions, Journey Builder, Email Studio, and consent basics.',
+  },
+  {
+    title: 'Experience Cloud',
+    topic: 'Salesforce Clouds',
+    aliases: ['experience cloud', 'community cloud'],
+    summary: '**Experience Cloud** lets teams build portals and sites for customers, partners, or employees on top of Salesforce data.',
+    example: 'A partner portal can let partners register deals, view records, and collaborate with your sales team.',
+    uses: ['Customer portals', 'Partner portals', 'Self-service knowledge sites'],
+    nextStep: 'Learn site setup, external users, sharing sets, audience targeting, and Experience Builder.',
+  },
+  {
+    title: 'Commerce Cloud',
+    topic: 'Salesforce Clouds',
+    aliases: ['commerce cloud'],
+    summary: '**Commerce Cloud** supports ecommerce storefronts, product catalogs, pricing, carts, checkout, and order experiences.',
+    example: 'A business can run an online store where customers browse products, add items to cart, and place orders.',
+    uses: ['B2C or B2B commerce', 'Product catalog management', 'Checkout and order workflows'],
+    nextStep: 'Learn catalog, product, price book, cart, checkout, and order-management basics.',
+  },
+  {
+    title: 'Agentforce',
+    topic: 'Salesforce AI',
+    aliases: ['agentforce', 'einstein copilot', 'salesforce ai agent'],
+    summary: '**Agentforce** is Salesforce AI agent functionality for helping users complete work using trusted CRM data and configured actions.',
+    example: 'An agent can help summarize a case, suggest next steps, or guide a user through a service workflow.',
+    uses: ['AI-assisted CRM work', 'Guided actions', 'Service, sales, and internal productivity use cases'],
+    nextStep: 'Learn topics, actions, grounding data, testing, and guardrails before building a production agent.',
+  },
+];
+
+/**
+ * @param {string} text
+ * @param {string} alias
+ * @returns {boolean}
+ */
+function includesConceptAlias(text, alias) {
+  const normalizedAlias = alias.replaceAll(' ', '\\s+');
+  return new RegExp(`(^|[^a-z0-9])${normalizedAlias}([^a-z0-9]|$)`, 'i').test(text);
+}
+
+/**
+ * @param {SalesforceConcept} concept
+ * @returns {string}
+ */
+function formatSalesforceConceptResponse(concept) {
+  return `**${concept.title}**
+
+Topic: **${concept.topic}**
+
+${concept.summary}
+
+**Example**
+${concept.example}
+
+**Common uses**
+${concept.uses.map((use) => `- ${use}`).join('\n')}
+
+Next step: ${concept.nextStep}`;
+}
+
+/**
+ * @param {string} learnerText
+ * @returns {string | null}
+ */
+function buildSalesforceConceptCatalogResponse(learnerText) {
+  const normalizedText = learnerText.toLowerCase();
+  const conceptsBySpecificity = [...SALESFORCE_CONCEPTS].sort(
+    (a, b) => Math.max(...b.aliases.map((alias) => alias.length)) - Math.max(...a.aliases.map((alias) => alias.length)),
+  );
+  const concept = conceptsBySpecificity.find(({ aliases }) =>
+    aliases.some((alias) => includesConceptAlias(normalizedText, alias)),
+  );
+
+  return concept ? formatSalesforceConceptResponse(concept) : null;
+}
+
+/**
  * @param {string} finalOutput
  * @param {string} learnerText
  * @returns {boolean}
@@ -144,7 +286,7 @@ function shouldUseResilientResponse(finalOutput, learnerText) {
  */
 function buildResilientLearningResponse(learnerText) {
   const normalizedText = learnerText.toLowerCase();
-  const knownConceptResponse = buildKnownSalesforceConceptResponse(learnerText);
+  const knownConceptResponse = buildSalesforceConceptCatalogResponse(learnerText);
   if (knownConceptResponse) return knownConceptResponse;
 
   const advancedDoubtTerms = [
@@ -442,7 +584,7 @@ Next step: Retry your message in 1-2 minutes, or use one of the Apex demo prompt
  */
 export async function runGeminiAgent(inputItems, systemPrompt) {
   const learnerText = inputItemsToText(inputItems);
-  const knownConceptResponse = buildKnownSalesforceConceptResponse(learnerText);
+  const knownConceptResponse = buildSalesforceConceptCatalogResponse(learnerText);
   if (knownConceptResponse) {
     return {
       finalOutput: knownConceptResponse,
