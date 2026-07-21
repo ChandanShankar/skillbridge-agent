@@ -3,6 +3,11 @@ name: Keep Render Awake
 on:
   schedule:
     - cron: "7 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/keep-render-awake.yml"
   workflow_dispatch:
 
 concurrency:
