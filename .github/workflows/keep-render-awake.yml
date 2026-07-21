@@ -25,7 +25,16 @@ jobs:
         run: |
           for attempt in {1..12}; do
             echo "Ping ${attempt}/12 at $(date -u)"
-            curl --fail --silent --show-error --max-time 120 https://skillbridge-agent.onrender.com/health
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --max-time 120 \
+              --retry 3 \
+              --retry-all-errors \
+              --retry-delay 10 \
+              https://skillbridge-agent.onrender.com/health \
+              || echo "Health ping failed after retries; continuing so the next ping can wake the app."
 
             if [ "$attempt" -lt 12 ]; then
               sleep 300
